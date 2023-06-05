@@ -6,6 +6,9 @@ import re
 import json
 import time
 
+#insert your urlscan API key here
+apiKey = ""
+
 # Ask the user for the target domain
 target = input("Enter target: ")
 
@@ -28,8 +31,7 @@ def certUtil(target):
 def urlScan(target):
     #print message to console
     print("Searching for subdomains with urlscan.io...")
-    #insert your API key here
-    headers = {'API-Key':'43f7bf89-0889-40bd-924b-20d6ae0f7a68','Content-Type':'application/json'}
+    headers = {'API-Key':apiKey,'Content-Type':'application/json'}
     data = {"url": target, "visibility": "public"}
     print("Generating unique UUID...")
     #send an api call to generate a request ID

@@ -5,7 +5,12 @@ from bs4 import BeautifulSoup
 import re
 import json
 import time
+
+#Adding the urlscan API key:
+#remove this import
 from config import API_KEY
+#uncomment the line below and add your urlscan API key
+#API_KEY = ""
 
 # Ask the user for the target domain
 target = input("Enter target: ")

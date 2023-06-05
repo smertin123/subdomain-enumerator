@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import time
-
-#insert your urlscan API key here
-apiKey = ""
+from config import API_KEY
 
 # Ask the user for the target domain
 target = input("Enter target: ")
@@ -22,16 +20,16 @@ def certUtil(target):
     # Parse the request
     soup = BeautifulSoup(html_content, "lxml")
     # Find all instances within data containing the target domain
-    subdomains = soup.find_all(text=re.compile(target))
+    subdomains = soup.find_all(string=re.compile(target))
     print("Identified subdomains for " + target + ":\n")
     # Print each finding to the CLI
     for i in subdomains: 
-        print(i.text)
+        print(i.string)
 
 def urlScan(target):
     #print message to console
     print("Searching for subdomains with urlscan.io...")
-    headers = {'API-Key':apiKey,'Content-Type':'application/json'}
+    headers = {'API-Key':API_KEY,'Content-Type':'application/json'}
     data = {"url": target, "visibility": "public"}
     print("Generating unique UUID...")
     #send an api call to generate a request ID

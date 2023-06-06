@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import time
+import sys
 
 #Adding the urlscan API key:
 #remove this import
@@ -13,11 +14,9 @@ from config import API_KEY
 #API_KEY = ""
 
 # Ask the user for the target domain
-target = input("Enter target: ")
+#target = input("Enter target: ")
 
-filename = target + '.txt'
-
-def crtsh(target):
+def crtsh(target, filename):
     with open(filename, 'a+') as file:
         file.seek(0)
         existing_subdomains = file.read().splitlines()
@@ -35,7 +34,7 @@ def crtsh(target):
         print("crt.sh results stored in " + filename)
         print("")
 
-def urlScan(target):
+def urlScan(target, filename):
     with open(filename, 'a+') as file:
         file.seek(0)  # Move the file cursor to the beginning
         existing_subdomains = file.read().splitlines()  # Read the file contents into a list
@@ -70,5 +69,27 @@ def urlScan(target):
         print("")
 
 #pass the target to all functions
-crtsh(target)
-urlScan(target)
+def run(target, filename):
+    crtsh(target, filename)
+    urlScan(target, filename)
+
+try:
+    def help():
+        print("\nUsage: subdomain-enumerator.py [OPTION] [TARGET]\n")
+        print("-s, --scan         scan target for subdomains (results stored in [TARGET].txt)")
+        print("-h, --help         display this help menu\n")
+        
+    if len(sys.argv) < 2 or (sys.argv[1] == "-h" or sys.argv[1] == "--help"):
+        help()
+
+    if len(sys.argv) > 2:
+        target = sys.argv[-1]
+        filename = str(target) + '.txt'
+        if (sys.argv[1] == "--scan" or sys.argv[1] == "-s"):
+            run(target, filename)
+        else:
+            print("Invalid option")
+            
+except KeyboardInterrupt:
+    print("\nTerminated by user.")
+    sys.exit(0)

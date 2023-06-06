@@ -13,9 +13,6 @@ from config import API_KEY
 #uncomment the line below and add your urlscan API key
 #API_KEY = ""
 
-# Ask the user for the target domain
-#target = input("Enter target: ")
-
 def crtsh(target, filename):
     with open(filename, 'a+') as file:
         file.seek(0)

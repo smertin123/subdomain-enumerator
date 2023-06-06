@@ -38,35 +38,39 @@ def urlScan(target, filename):
     with open(filename, 'a+') as file:
         file.seek(0)  # Move the file cursor to the beginning
         existing_subdomains = file.read().splitlines()  # Read the file contents into a list
-        #print message to console
+    
+        def search_json(json_obj, target, file):
+            if isinstance(json_obj, dict):
+                for key, value in json_obj.items():
+                    if isinstance(value, str):
+                        matches = re.findall(r"(\w+\." + re.escape(target) + ")", value)
+                        for match in matches:
+                            if match not in existing_subdomains:
+                                file.write(match + '\n')
+                                existing_subdomains.append(match)
+                    elif isinstance(value, (dict, list)):
+                        search_json(value, target, file)
+            elif isinstance(json_obj, list):
+                for item in json_obj:
+                    search_json(item, target, file)
+
         print("Searching for subdomains with urlscan.io...")
         headers = {'API-Key': API_KEY, 'Content-Type': 'application/json'}
         data = {"url": target, "visibility": "public"}
+
         print("Generating unique UUID...")
-        #send an api call to generate a request ID
         response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data))
         response_list = response.json()
-        #grab the unique request UUID search url
         url = response_list["api"]
-        #urlscan takes a while to populate data. sleep for 2 minutes.
-        print("Urlscan takes a while to populate... Waiting for 1 minute")
+
+        print("Urlscan takes a while to populate... Waiting for 30 seconds")
         time.sleep(30)
-        print("Just 30 seconds more...")
-        time.sleep(30)
-        #send a request to the unique UUID search url
+
         response = requests.get(url)
-        response_list = response.json()
-        #grab the subdomains from the response
-        subdomains = response_list["data"]["requests"][0]["request"]["redirectResponse"]["securityDetails"]["sanList"]
-        print("Identified subdomains for " + target + ":\n")
-        # Print each finding to the CLI
-        for i in subdomains:
-            subdomain = i
-            if subdomain.endswith(target) and subdomain not in existing_subdomains:
-                file.write(subdomain + '\n')
-                existing_subdomains.append(subdomain)  
-        print("Results stored in " + filename)
-        print("")
+        data = response.json()
+
+        # Call the search_json function
+        search_json(data, target, file)
 
 #pass the target to all functions
 def run(target, filename):

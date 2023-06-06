@@ -15,7 +15,7 @@ To use urlscan.io you will need a valid API key. Once you have signed up and obt
 
 # Usage
 
-python ./subdomain-enumerator.py \[OPTIONS\] \[TARGET\]
+python subdomain-enumerator.py \[OPTION\] \[TARGET\]
 
 ![alt text](/img/help.png)
 

@@ -26,7 +26,7 @@ def crtsh(target):
         url = "https://crt.sh/?q=" + target
         html_content = requests.get(url).text
         soup = BeautifulSoup(html_content, "lxml")
-        subdomains = soup.find_all(string=re.compile("." + target))
+        subdomains = soup.find_all(string=re.compile(target))
         for i in subdomains:
             subdomain = i
             if subdomain not in existing_subdomains:

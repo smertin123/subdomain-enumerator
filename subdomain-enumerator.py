@@ -26,20 +26,22 @@ def crtsh(target, filename):
         html_content = requests.get(url).text
         soup = BeautifulSoup(html_content, "lxml")
         subdomains = soup.find_all(string=re.compile(target))
+        uniqueCount = 0
         for i in subdomains:
             subdomain = i
             if subdomain not in existing_subdomains:
                 file.write(subdomain + '\n')
-                existing_subdomains.append(subdomain)                
-        print("crt.sh results stored in " + filename)
-        print("")
+                existing_subdomains.append(subdomain)
+                uniqueCount += 1
+        print(str(uniqueCount) + " unique subdomains stored in " + filename + "\n")
 
 def urlScan(target, filename):
     with open(filename, 'a+') as file:
         file.seek(0)  # Move the file cursor to the beginning
         existing_subdomains = file.read().splitlines()  # Read the file contents into a list
-    
-        def search_json(json_obj, target, file):
+
+        def search_json(json_obj, target, file, existing_subdomains):
+            uniqueCount = 0
             if isinstance(json_obj, dict):
                 for key, value in json_obj.items():
                     if isinstance(value, str):
@@ -48,11 +50,13 @@ def urlScan(target, filename):
                             if match not in existing_subdomains:
                                 file.write(match + '\n')
                                 existing_subdomains.append(match)
+                                uniqueCount += 1
                     elif isinstance(value, (dict, list)):
-                        search_json(value, target, file)
+                        uniqueCount += search_json(value, target, file, existing_subdomains)
             elif isinstance(json_obj, list):
                 for item in json_obj:
-                    search_json(item, target, file)
+                    uniqueCount += search_json(item, target, file, existing_subdomains)
+            return uniqueCount
 
         print("Searching for subdomains with urlscan.io...")
         headers = {'API-Key': API_KEY, 'Content-Type': 'application/json'}
@@ -69,8 +73,10 @@ def urlScan(target, filename):
         response = requests.get(url)
         data = response.json()
 
-        # Call the search_json function
-        search_json(data, target, file)
+        # Call the search_json function with existing_subdomains argument
+        unique_subdomain_count = search_json(data, target, file, existing_subdomains)
+
+        print(str(unique_subdomain_count) + " unique subdomains stored in " + filename + "\n")
 
 #pass the target to all functions
 def run(target, filename):
